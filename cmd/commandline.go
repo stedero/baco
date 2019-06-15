@@ -43,7 +43,7 @@ func toOutputfile(infile string) string {
 func usage() {
 	fmt.Printf("Usage of %s:\n", os.Args[0])
 	fmt.Printf("\t%s [-v] <inputfile> [<outputfile>]\n", os.Args[0])
-	fmt.Printf("If no outputfile is provided then name of the input file is used with the extension .json")
+	fmt.Printf("\tif no outputfile is provided then name of the input file is used with the extension .json\n")
 	flag.PrintDefaults()
 	exit()
 }
