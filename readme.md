@@ -6,4 +6,4 @@ Usage of baco:
         baco [-v] <input file> [<output file>]
   -v    verbose output
 ```
-When no output file is provided the name of the input file is used with the extension .json.
+When no output file is provided then name of the input file is used with the extension .json.
