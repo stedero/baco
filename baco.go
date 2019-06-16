@@ -2,10 +2,12 @@ package main
 
 import (
 	"basta/ravo/baco/cmd"
-	"fmt"
+	"basta/ravo/baco/model"
+	"basta/ravo/baco/rio"
 )
 
 func main() {
 	_, filenamer := cmd.ParseCommandLine()
-	fmt.Printf("inputfile: %s\noutputfile: %s\n", filenamer.Inputfile(), filenamer.Outputfile())
+	rec := model.ReadRavoRecord(rio.OpenFile(filenamer.Inputfile()))
+	rec.WriteJSON(rio.CreateFile(filenamer.Outputfile()))
 }
