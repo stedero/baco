@@ -13,6 +13,7 @@ type RavoBool struct {
 	Value bool `xml:",innerxml" json:"value"`
 }
 
+// RavoHTML is used for embeded HTML
 type RavoHTML struct {
 	InnerXML string `xml:",innerxml"`
 }
@@ -64,7 +65,7 @@ type RavoRecord struct {
 	WettelijkVereistImpact                    string `xml:"WettelijkVereistImpact"`
 	GarantieAanspraakImpact                   string `xml:"GarantieAanspraakImpact"`
 	NietConformFunctieEisenImpact             string `xml:"NietConformFunctieEisenImpact"`
-	NietConformKwaliteitEisenImpact           string `xml:"NietConformKwaliteitEisenImpact"`
+	NietConformKwaliteitEisenImpact           int64  `xml:"NietConformKwaliteitEisenImpact"`
 	AndereLeverancier                         RavoBool
 	AndereLeverancier2                        RavoBool
 	VoorNadeel                                int64 `xml:"VoorNadeel"`
