@@ -9,7 +9,7 @@ import (
 
 // RavoHTML is used for embeded HTML
 type RavoHTML struct {
-	InnerXML string `xml:",innerxml"`
+	InnerXML string `xml:",innerxml" json:"html"`
 }
 
 // RavoRecord defines a Ravo XML record.
