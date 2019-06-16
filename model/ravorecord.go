@@ -7,12 +7,6 @@ import (
 	"log"
 )
 
-// RavoBool defines Ravo boolean type as encoded in XML
-type RavoBool struct {
-	Nil   bool `xml:"nil,attr" json:"nil"`
-	Value bool `xml:",innerxml" json:"value"`
-}
-
 // RavoHTML is used for embeded HTML
 type RavoHTML struct {
 	InnerXML string `xml:",innerxml"`
@@ -45,19 +39,19 @@ type RavoRecord struct {
 	ProductwijzigingLeverancier               bool   `xml:"ProductwijzigingLeverancier"`
 	ProductwijzigingIntern                    bool   `xml:"ProductwijzigingIntern"`
 	Anders                                    bool   `xml:"Anders"`
-	VeiligheidsrisicoAantal                   RavoBool
-	MilieuschadeRisicoAantal                  RavoBool
-	KlantklachtAantal                         RavoBool
-	WettelijkVereistAantal                    RavoBool
-	GarantieAanspraakAantal                   RavoBool
-	NietConformFunctieEisenAantal             RavoBool
-	NietConformKwaliteitEisenAantal           int64 `xml:"NietConformKwaliteitEisenAantal"`
-	EfficiencyVeranderingMontageMinutenAantal RavoBool
-	KostprijsVeranderingAantal                int64 `xml:"KostprijsVeranderingAantal"`
-	ProductStandaardisatieAantal              RavoBool
-	ProductwijzigingLeverancierAantal         RavoBool
-	ProductwijzigingInternAantal              RavoBool
-	AndersAantal                              RavoBool
+	VeiligheidsrisicoAantal                   int64  `xml:"VeiligheidsrisicoAantal"`
+	MilieuschadeRisicoAantal                  int64  `xml:"MilieuschadeRisicoAantal"`
+	KlantklachtAantal                         int64  `xml:"KlantklachtAantal"`
+	WettelijkVereistAantal                    int64  `xml:"WettelijkVereistAantal"`
+	GarantieAanspraakAantal                   int64  `xml:"GarantieAanspraakAantal"`
+	NietConformFunctieEisenAantal             int64  `xml:"NietConformFunctieEisenAantal"`
+	NietConformKwaliteitEisenAantal           int64  `xml:"NietConformKwaliteitEisenAantal"`
+	EfficiencyVeranderingMontageMinutenAantal int64  `xml:"EfficiencyVeranderingMontageMinutenAantal"`
+	KostprijsVeranderingAantal                int64  `xml:"KostprijsVeranderingAantal"`
+	ProductStandaardisatieAantal              int64  `xml:"ProductStandaardisatieAantal"`
+	ProductwijzigingLeverancierAantal         int64  `xml:"ProductwijzigingLeverancierAantal"`
+	ProductwijzigingInternAantal              int64  `xml:"ProductwijzigingInternAantal"`
+	AndersAantal                              int64  `xml:"AndersAantal"`
 	AndersWat                                 string `xml:"AndersWat"`
 	VeiligheidsrisicoImpact                   string `xml:"VeiligheidsrisicoImpact"`
 	MilieuschadeRisicoImpact                  string `xml:"MilieuschadeRisicoImpact"`
@@ -66,10 +60,10 @@ type RavoRecord struct {
 	GarantieAanspraakImpact                   string `xml:"GarantieAanspraakImpact"`
 	NietConformFunctieEisenImpact             string `xml:"NietConformFunctieEisenImpact"`
 	NietConformKwaliteitEisenImpact           int64  `xml:"NietConformKwaliteitEisenImpact"`
-	AndereLeverancier                         RavoBool
-	AndereLeverancier2                        RavoBool
-	VoorNadeel                                int64 `xml:"VoorNadeel"`
-	VoorNadeel2                               RavoBool
+	AndereLeverancier                         string `xml:"AndereLeverancier"`
+	AndereLeverancier2                        string `xml:"AndereLeverancier2"`
+	VoorNadeel                                int64  `xml:"VoorNadeel"`
+	VoorNadeel2                               int64  `xml:"VoorNadeel2"`
 	Probleemstelling                          RavoHTML
 	KlantklachtNr                             string `xml:"KlantklachtNr"`
 	NotificationNr                            string `xml:"NotificationNr"`
@@ -77,7 +71,7 @@ type RavoRecord struct {
 	PrioriteitKlant                           string `xml:"PrioriteitKlant"`
 	PrioriteitAanvrager                       int64  `xml:"PrioriteitAanvrager"`
 	CommercielePrioriteit                     int64  `xml:"CommercielePrioriteit"`
-	MeerkostenGeschat                         RavoBool
+	MeerkostenGeschat                         int64  `xml:"MeerkostenGeschat"`
 	MinderkostenGeschat                       int64  `xml:"MinderkostenGeschat"`
 	NotitiesRWVbehandelaarNaam                string `xml:"NotitiesRWVbehandelaarNaam"`
 	NotitiesRWVbehandelaar                    string `xml:"NotitiesRWVbehandelaar"`
@@ -92,6 +86,54 @@ type RavoRecord struct {
 	Normuur                                   int64  `xml:"Normuur"`
 	InschattingEngTotaal                      int64  `xml:"InschattingEngTotaal"`
 	InschattingOverig                         int64  `xml:"InschattingOverig"`
+	NormuurOverig                             int64  `xml:"NormuurOverig"`
+	InschattingOverigTotaal                   int64  `xml:"InschattingOverigTotaal"`
+	TerugkoppelingDoor                        string `xml:"TerugkoppelingDoor"`
+	TerugkoppelingDoorParaaf                  string `xml:"TerugkoppelingDoorParaaf"`
+	TerugkoppelingDoorDatum                   string `xml:"TerugkoppelingDoorDatum"`
+	Geaccepteerd                              bool   `xml:"Geaccepteerd"`
+	GeaccepteerdOVProdMan                     bool   `xml:"GeaccepteerdOVProdMan"`
+	GeaccepteerdOVOverig                      bool   `xml:"GeaccepteerdOVOverig"`
+	GeaccepteerdPrio                          int64  `xml:"GeaccepteerdPrio"`
+	GeaccepteerdDatum                         string `xml:"GeaccepteerdDatum"`
+	GeaccepteerdDatumSAP                      string `xml:"GeaccepteerdDatumSAP"`
+	GeaccepteerdOVProdManReden                string `xml:"GeaccepteerdOVProdManReden"`
+	GeaccepteerdOVProdManDatum                string `xml:"GeaccepteerdOVProdManDatum"`
+	GeaccepteerdOVOverigReden                 string `xml:"GeaccepteerdOVOverigReden"`
+	GeaccepteerdOVOverigDatum                 string `xml:"GeaccepteerdOVOverigDatum"`
+	Afgewezen                                 bool   `xml:"Afgewezen"`
+	AfgewezenReden                            string `xml:"AfgewezenReden"`
+	AfgewezenDatum                            string `xml:"AfgewezenDatum"`
+	VerkoopgebiedAnders                       string `xml:"VerkoopgebiedAnders"`
+	Cabine                                    bool   `xml:"Cabine"`
+	Container                                 bool   `xml:"Container"`
+	Chassis                                   bool   `xml:"Chassis"`
+	Optie                                     bool   `xml:"Optie"`
+	SparePart                                 bool   `xml:"SparePart"`
+	Europa                                    bool   `xml:"Europa"`
+	NAmerika                                  bool   `xml:"NAmerika"`
+	ROW                                       bool   `xml:"ROW"`
+	R540                                      bool   `xml:"R540"`
+	R560                                      bool   `xml:"R560"`
+	SnelheidAnders                            bool   `xml:"SnelheidAnders"`
+	Euro6                                     bool   `xml:"EURO-6" json:"EURO-6"`
+	StageIII                                  bool   `xml:"STAGE-III" json:"STAGE-III"`
+	Tier3USA                                  bool   `xml:"TIER3-USA" json:"TIER3-USA"`
+	Tier4USA                                  bool   `xml:"TIER4-USA" json:"TIER4-USA"`
+	MotorAandrijving                          bool   `xml:"MotorAandrijving"`
+	Hydrauliek                                bool   `xml:"Hydrauliek"`
+	Elektra                                   bool   `xml:"Elektra"`
+	Constructie                               bool   `xml:"Constructie"`
+	Montage                                   bool   `xml:"Montage"`
+	Oppervlaktebehandeling                    bool   `xml:"Oppervlaktebehandeling"`
+	Bijlage                                   string `xml:"Bijlage"`
+	MeerMinder                                string `xml:"MeerMinder"`
+	ArtikelTekeningNr                         struct {
+		ArtikelTekening string `xml:"ArtikelTekening"`
+		ArtikelNaam     string `xml:"ArtikelNaam"`
+	} `xml:"ArtikelTekeningNr"`
+	Betreft     string `xml:"Betreft"`
+	Afgehandeld bool   `xml:"Afgehandeld"`
 }
 
 // ReadRavoRecord read a Ravo XML record.
