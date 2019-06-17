@@ -7,6 +7,10 @@ import (
 	"log"
 )
 
+type wrapper struct {
+	MijnVelden *RavoRecord `json:"mijnVelden"`
+}
+
 // RavoHTML is used for embeded HTML
 type RavoHTML struct {
 	InnerXML string `xml:",innerxml" json:"html"`
@@ -149,7 +153,7 @@ func ReadRavoRecord(r io.Reader) *RavoRecord {
 
 // WriteJSON writes a Ravo record as JSON
 func (rr *RavoRecord) WriteJSON(w io.Writer) {
-	data, err := json.MarshalIndent(rr, "", "    ")
+	data, err := json.MarshalIndent(wrapper{rr}, "", "    ")
 	if err != nil {
 		log.Fatalf("failed to marshal to JSON: %v", err)
 	}
