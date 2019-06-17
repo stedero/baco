@@ -11,7 +11,7 @@ type wrapper struct {
 	MijnVelden *RavoRecord `json:"mijnVelden"`
 }
 
-// RavoHTML is used for embeded HTML
+// RavoHTML is used for embedded HTML
 type RavoHTML struct {
 	InnerXML string `xml:",innerxml" json:"html"`
 }
