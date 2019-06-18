@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"basta/ravo/baco/paths"
+	"basta/ravo/baco/cfg"
 	"flag"
 	"fmt"
 	"os"
@@ -10,15 +10,24 @@ import (
 )
 
 const outputExtension = ".json"
+const defaultPort = 8080
 
-// ParseCommandLine extracts flags and file names from the command line.
-func ParseCommandLine() (bool, *paths.Filenamer) {
+// ParseCommandLine extracts flags and arguments from the commandline
+func ParseCommandLine() (bool, *cfg.Config) {
 	var verbose bool
+	var help bool
+	var port int64
 	flag.Usage = usage
 	flag.BoolVar(&verbose, "v", false, "verbose output")
+	flag.BoolVar(&help, "h", false, "help")
+	flag.Int64Var(&port, "p", defaultPort, "port number")
 	flag.Parse()
-	if flag.NArg() < 1 {
-		flag.Usage()
+	if flag.NArg() == 0 {
+		if help {
+			flag.Usage()
+		} else {
+			return false, cfg.NewServerConfig(port)
+		}
 	} else {
 		var infile, outfile string
 		if flag.NArg() == 1 {
@@ -31,7 +40,7 @@ func ParseCommandLine() (bool, *paths.Filenamer) {
 			fmt.Printf("file %s does not exist\n", infile)
 			exit()
 		}
-		return verbose, paths.NewFilenamer(infile, outfile)
+		return verbose, cfg.NewFileConfig(infile, outfile)
 	}
 	return false, nil
 }
@@ -42,7 +51,7 @@ func toOutputfile(infile string) string {
 
 func usage() {
 	fmt.Printf("Usage of %s:\n", os.Args[0])
-	fmt.Printf("\t%s [-v] <inputfile> [<outputfile>]\n", os.Args[0])
+	fmt.Printf("\t%s [-h] [-p] [-v] <inputfile> [<outputfile>]\n", os.Args[0])
 	fmt.Printf("\tif no outputfile is provided then name of the input file is used with the extension .json\n")
 	flag.PrintDefaults()
 	exit()

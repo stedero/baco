@@ -4,10 +4,15 @@ import (
 	"basta/ravo/baco/cmd"
 	"basta/ravo/baco/model"
 	"basta/ravo/baco/rio"
+	"fmt"
 )
 
 func main() {
-	_, filenamer := cmd.ParseCommandLine()
-	rec := model.ReadRavoRecord(rio.OpenFile(filenamer.Inputfile()))
-	rec.WriteJSON(rio.CreateFile(filenamer.Outputfile()))
+	_, config := cmd.ParseCommandLine()
+	if config.RunAsService() {
+		fmt.Printf("Starting %s as a service on port %d\n", config.AppName(), config.Port())
+	} else {
+		rec := model.ReadRavoRecord(rio.OpenFile(config.Inputfile()))
+		rec.WriteJSON(rio.CreateFile(config.Outputfile()))
+	}
 }
