@@ -11,4 +11,4 @@ Usage of baco:
   -h    help
   -p int
         port number (default 8080)
-  -v    verbose output```
+  -v    verbose output
