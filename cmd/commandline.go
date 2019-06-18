@@ -51,8 +51,9 @@ func toOutputfile(infile string) string {
 
 func usage() {
 	fmt.Printf("Usage of %s:\n", os.Args[0])
-	fmt.Printf("\t%s [-h] [-p] [-v] <inputfile> [<outputfile>]\n", os.Args[0])
-	fmt.Printf("\tif no outputfile is provided then name of the input file is used with the extension .json\n")
+	fmt.Printf("\t%s [-h] [-p] [-v] [<inputfile>] [<outputfile>]\n", os.Args[0])
+	fmt.Printf("\n\tif no inputfile is provided then the application is started as a service on the specified port or on the default port %d\n", defaultPort)
+	fmt.Printf("\tif no outputfile is provided then name of the input file is used with the extension .json\n\n")
 	flag.PrintDefaults()
 	exit()
 }
