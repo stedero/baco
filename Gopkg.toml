@@ -31,5 +31,5 @@
 
 
 [metadata.heroku]
-  root-package = "basta/revo/baco"
+  root-package = "basta/ravo/baco"
   ensure = "false"
