@@ -4,7 +4,7 @@ import "os"
 
 // Config holds configuration options
 type Config struct {
-	port       int64
+	port       int
 	inputfile  string
 	outputfile string
 }
@@ -15,12 +15,12 @@ func NewFileConfig(inputFile, outputfile string) *Config {
 }
 
 // NewServerConfig creates a server configuration
-func NewServerConfig(port int64) *Config {
+func NewServerConfig(port int) *Config {
 	return &Config{port: port}
 }
 
 // Port return the port this server runs on
-func (conf *Config) Port() int64 {
+func (conf *Config) Port() int {
 	return conf.port
 }
 

@@ -16,11 +16,11 @@ const defaultPort = 8080
 func ParseCommandLine() (bool, *cfg.Config) {
 	var verbose bool
 	var help bool
-	var port int64
+	var port int
 	flag.Usage = usage
 	flag.BoolVar(&verbose, "v", false, "verbose output")
 	flag.BoolVar(&help, "h", false, "help")
-	flag.Int64Var(&port, "p", defaultPort, "port number")
+	flag.IntVar(&port, "p", defaultPort, "port number")
 	flag.Parse()
 	if flag.NArg() == 0 {
 		if help {
