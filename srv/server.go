@@ -58,7 +58,7 @@ func process(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if err != nil {
-		msg := fmt.Sprintf("failed to transform: %v", err)
+		msg := fmt.Sprintf("failed to transform XML to JSON: %v", err)
 		w.WriteHeader(500)
 		w.Write([]byte(msg))
 	}

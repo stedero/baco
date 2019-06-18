@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -26,7 +27,7 @@ func ParseCommandLine() (bool, *cfg.Config) {
 		if help {
 			flag.Usage()
 		} else {
-			return false, cfg.NewServerConfig(port)
+			return false, cfg.NewServerConfig(getPort(port))
 		}
 	} else {
 		var infile, outfile string
@@ -56,6 +57,17 @@ func usage() {
 	fmt.Printf("\tif no outputfile is provided then name of the input file is used with the extension .json\n\n")
 	flag.PrintDefaults()
 	exit()
+}
+
+func getPort(port int) int {
+	envPortStr := os.Getenv("PORT")
+	if envPortStr != "" {
+		envPort, err := strconv.Atoi(envPortStr)
+		if err == nil {
+			return envPort
+		}
+	}
+	return port
 }
 
 func exit() {
