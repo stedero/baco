@@ -40,7 +40,7 @@ func showForm(w http.ResponseWriter) {
 					<title>Baco - Bart's XML to JSON converter for Revo</title>
 				</head>
 				<body>
-					<h1>Baco - Bart's XML to JSON converter for Revo</h1>
+					<h2>Baco - Bart's XML to JSON converter for Revo</h1>
 					<form action="/" method="post" enctype="multipart/form-data">
 						<input type="file" name="upload"><br><br>
 						<input type="submit">
