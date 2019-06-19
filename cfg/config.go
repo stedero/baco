@@ -1,17 +1,22 @@
 package cfg
 
-import "os"
+import (
+	"os"
+	"path/filepath"
+	"strings"
+)
 
 // Config holds configuration options
 type Config struct {
 	port       int
+	isZIP      bool
 	inputfile  string
 	outputfile string
 }
 
 // NewFileConfig creates a file handler configuration
-func NewFileConfig(inputFile, outputfile string) *Config {
-	return &Config{inputfile: inputFile, outputfile: outputfile}
+func NewFileConfig(inputfile, outputfile string) *Config {
+	return &Config{isZIP: isZIPFile(inputfile), inputfile: inputfile, outputfile: outputfile}
 }
 
 // NewServerConfig creates a server configuration
@@ -42,4 +47,8 @@ func (conf *Config) RunAsService() bool {
 // AppName provides the application name
 func (conf *Config) AppName() string {
 	return os.Args[0]
+}
+
+func isZIPFile(filename string) bool {
+	return strings.EqualFold(filepath.Ext(filename), ".zip")
 }

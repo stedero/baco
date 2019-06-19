@@ -4,20 +4,19 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"io"
-	"log"
 )
 
 type wrapper struct {
-	MijnVelden *RavoRecord `json:"mijnVelden"`
+	MijnVelden *ravoRecord `json:"mijnVelden"`
 }
 
-// RavoHTML is used for embedded HTML
-type RavoHTML struct {
+// ravoHTML is used for embedded HTML
+type ravoHTML struct {
 	InnerXML string `xml:",innerxml" json:"html"`
 }
 
-// RavoRecord defines a Ravo XML record.
-type RavoRecord struct {
+// ravoRecord defines a Ravo XML record.
+type ravoRecord struct {
 	Klant                                     bool   `xml:"klant"`
 	Sales                                     bool   `xml:"Sales"`
 	AfterSalesService                         bool   `xml:"AfterSalesService"`
@@ -68,10 +67,10 @@ type RavoRecord struct {
 	AndereLeverancier2                        string `xml:"AndereLeverancier2"`
 	VoorNadeel                                int64  `xml:"VoorNadeel"`
 	VoorNadeel2                               int64  `xml:"VoorNadeel2"`
-	Probleemstelling                          RavoHTML
+	Probleemstelling                          ravoHTML
 	KlantklachtNr                             string `xml:"KlantklachtNr"`
 	NotificationNr                            string `xml:"NotificationNr"`
-	VoorstelVoorVerbetering                   RavoHTML
+	VoorstelVoorVerbetering                   ravoHTML
 	PrioriteitKlant                           string `xml:"PrioriteitKlant"`
 	PrioriteitAanvrager                       int64  `xml:"PrioriteitAanvrager"`
 	CommercielePrioriteit                     int64  `xml:"CommercielePrioriteit"`
@@ -140,25 +139,35 @@ type RavoRecord struct {
 	Afgehandeld bool   `xml:"Afgehandeld"`
 }
 
-// ReadRavoRecord read a Ravo XML record.
-func ReadRavoRecord(r io.Reader) *RavoRecord {
-	var ravoRecord RavoRecord
-	decoder := xml.NewDecoder(r)
-	err := decoder.Decode(&ravoRecord)
+// Convert XML to JSON
+func Convert(r io.Reader, w io.Writer) error {
+	rec, err := readRavoRecord(r)
 	if err != nil {
-		log.Fatalf("error unmarshaling Ravo record: %v", err)
+		return err
 	}
-	return &ravoRecord
+	return rec.writeJSON(w)
 }
 
-// WriteJSON writes a Ravo record as JSON
-func (rr *RavoRecord) WriteJSON(w io.Writer) {
-	data, err := json.MarshalIndent(wrapper{rr}, "", "    ")
+// readRavoRecord read a Ravo XML record.
+func readRavoRecord(r io.Reader) (*ravoRecord, error) {
+	var rr ravoRecord
+	decoder := xml.NewDecoder(r)
+	err := decoder.Decode(&rr)
 	if err != nil {
-		log.Fatalf("failed to marshal to JSON: %v", err)
+		return nil, err
+	}
+	return &rr, nil
+}
+
+// writeJSON writes a Ravo record as JSON
+func (rr *ravoRecord) writeJSON(w io.Writer) error {
+	data, err := json.MarshalIndent(wrapper{rr}, "", "  ")
+	if err != nil {
+		return err
 	}
 	_, err = w.Write(data)
 	if err != nil {
-		log.Fatalf("failed to write JSON: %v", err)
+		return err
 	}
+	return nil
 }

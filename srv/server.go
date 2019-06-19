@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+type serverWriter struct {
+	w http.ResponseWriter
+}
+
 const maxFormParseMemorySizeBytes = 1024 * 1024
 
 // Start the server
@@ -50,12 +54,7 @@ func process(w http.ResponseWriter, r *http.Request) {
 	defer serverError(w, r)
 	reader, err := getReader(r)
 	if err == nil {
-		rec := model.ReadRavoRecord(reader)
-		if err == nil {
-			w.Header().Set("Content-Type", "application/json; charset=utf-8")
-			w.WriteHeader(200)
-			rec.WriteJSON(w)
-		}
+		err = model.Convert(reader, &serverWriter{w})
 	}
 	if err != nil {
 		msg := fmt.Sprintf("failed to transform XML to JSON: %v", err)
@@ -72,6 +71,12 @@ func getReader(r *http.Request) (io.Reader, error) {
 		return fileHeader.Open()
 	}
 	return r.Body, nil
+}
+
+func (sw *serverWriter) Write(data []byte) (n int, err error) {
+	sw.w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	sw.w.WriteHeader(200)
+	return sw.w.Write(data)
 }
 
 func serverError(w http.ResponseWriter, rec *http.Request) {

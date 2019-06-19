@@ -10,7 +10,8 @@ import (
 	"strings"
 )
 
-const outputExtension = ".json"
+const jsonSuffix = "_json"
+const jsonExtension = ".json"
 const defaultPort = 8080
 
 // ParseCommandLine extracts flags and arguments from the commandline
@@ -47,7 +48,11 @@ func ParseCommandLine() (bool, *cfg.Config) {
 }
 
 func toOutputfile(infile string) string {
-	return strings.TrimSuffix(infile, filepath.Ext(infile)) + outputExtension
+	ext := filepath.Ext(infile)
+	if strings.EqualFold(ext, ".zip") {
+		return strings.TrimSuffix(infile, ext) + jsonSuffix + ext
+	}
+	return strings.TrimSuffix(infile, ext) + jsonExtension
 }
 
 func usage() {

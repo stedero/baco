@@ -2,10 +2,10 @@ package main
 
 import (
 	"basta/ravo/baco/cmd"
-	"basta/ravo/baco/model"
-	"basta/ravo/baco/rio"
+	"basta/ravo/baco/fip"
 	"basta/ravo/baco/srv"
 	"fmt"
+	"log"
 )
 
 func main() {
@@ -14,7 +14,9 @@ func main() {
 		fmt.Printf("Starting %s as a service on port %d\n", config.AppName(), config.Port())
 		srv.Start(config.Port())
 	} else {
-		rec := model.ReadRavoRecord(rio.OpenFile(config.Inputfile()))
-		rec.WriteJSON(rio.CreateFile(config.Outputfile()))
+		err := fip.ConvertFile(config.Inputfile(), config.Outputfile())
+		if err != nil {
+			log.Fatalf("failed to convert %s to %s [%v]", config.Inputfile(), config.Outputfile(), err)
+		}
 	}
 }
