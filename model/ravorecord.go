@@ -166,8 +166,5 @@ func (rr *ravoRecord) writeJSON(w io.Writer) error {
 		return err
 	}
 	_, err = w.Write(data)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
