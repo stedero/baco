@@ -2,6 +2,7 @@ package srv
 
 import (
 	"basta/ravo/baco/model"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,7 +15,7 @@ type serverWriter struct {
 	w http.ResponseWriter
 }
 
-const maxFormParseMemorySizeBytes = 1024 * 1024
+const maxFormParseMemorySizeBytes = 10 * 1024 * 1024
 
 // Start the server
 func Start(port int) {
@@ -53,8 +54,8 @@ func showForm(w http.ResponseWriter) {
 func process(w http.ResponseWriter, r *http.Request) {
 	defer serverError(w, r)
 	reader, err := getReader(r)
-	defer reader.Close()
 	if err == nil {
+		defer reader.Close()
 		err = model.Convert(reader, &serverWriter{w})
 	}
 	if err != nil {
@@ -68,7 +69,11 @@ func getReader(r *http.Request) (io.ReadCloser, error) {
 	contentType := r.Header["Content-Type"]
 	if contentType != nil && strings.HasPrefix(contentType[0], "multipart/form-data") {
 		r.ParseMultipartForm(maxFormParseMemorySizeBytes)
-		fileHeader := r.MultipartForm.File["upload"][0]
+		file := r.MultipartForm.File["upload"]
+		if file == nil {
+			return nil, errors.New("no content")
+		}
+		fileHeader := file[0]
 		return fileHeader.Open()
 	}
 	return r.Body, nil
