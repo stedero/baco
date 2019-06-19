@@ -53,6 +53,7 @@ func showForm(w http.ResponseWriter) {
 func process(w http.ResponseWriter, r *http.Request) {
 	defer serverError(w, r)
 	reader, err := getReader(r)
+	defer reader.Close()
 	if err == nil {
 		err = model.Convert(reader, &serverWriter{w})
 	}
@@ -63,7 +64,7 @@ func process(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getReader(r *http.Request) (io.Reader, error) {
+func getReader(r *http.Request) (io.ReadCloser, error) {
 	contentType := r.Header["Content-Type"]
 	if contentType != nil && strings.HasPrefix(contentType[0], "multipart/form-data") {
 		r.ParseMultipartForm(maxFormParseMemorySizeBytes)
