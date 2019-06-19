@@ -14,7 +14,7 @@ func main() {
 		fmt.Printf("Starting %s as a service on port %d\n", config.AppName(), config.Port())
 		srv.Start(config.Port())
 	} else {
-		err := fip.ConvertFile(config.Inputfile(), config.Outputfile())
+		err := fip.Convert(config)
 		if err != nil {
 			log.Fatalf("failed to convert %s to %s [%v]", config.Inputfile(), config.Outputfile(), err)
 		}

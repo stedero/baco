@@ -44,6 +44,11 @@ func (conf *Config) RunAsService() bool {
 	return conf.port > 0
 }
 
+// IsZIP indicates whether the input file is a ZIP file
+func (conf *Config) IsZIP() bool {
+	return conf.isZIP
+}
+
 // AppName provides the application name
 func (conf *Config) AppName() string {
 	return os.Args[0]
