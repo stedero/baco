@@ -1,8 +1,12 @@
 package model
 
 import (
+	"basta/ravo/baco/rio"
+	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"io"
 )
 
@@ -130,6 +134,7 @@ type ravoRecord struct {
 	Montage                                   bool   `xml:"Montage"`
 	Oppervlaktebehandeling                    bool   `xml:"Oppervlaktebehandeling"`
 	Bijlage                                   string `xml:"Bijlage"`
+	StrippedBijlage                           string `xml:"StrippedBijlage"`
 	MeerMinder                                string `xml:"MeerMinder"`
 	ArtikelTekeningNr                         struct {
 		ArtikelTekening string `xml:"ArtikelTekening"`
@@ -145,6 +150,8 @@ func Convert(r io.Reader, w io.Writer) error {
 	if err != nil {
 		return err
 	}
+	rec.createdStrippedBijlage()
+	// rec.saveBijlage()
 	return rec.writeJSON(w)
 }
 
@@ -167,4 +174,17 @@ func (rr *ravoRecord) writeJSON(w io.Writer) error {
 	}
 	_, err = w.Write(data)
 	return err
+}
+
+func (rr *ravoRecord) saveBijlage() {
+	img, _ := base64.StdEncoding.DecodeString(rr.Bijlage)
+	fmt.Printf("%s", hex.Dump(img[:128]))
+	writer := rio.CreateFile("/Users/steef/Desktop/Basta/bijlage.jpg")
+	writer.Write(img)
+	writer.Close()
+}
+
+func (rr *ravoRecord) createdStrippedBijlage() {
+	img, _ := base64.StdEncoding.DecodeString(rr.Bijlage)
+	rr.StrippedBijlage = base64.StdEncoding.EncodeToString(img[64:])
 }
