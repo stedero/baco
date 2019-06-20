@@ -35,6 +35,8 @@ func handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func showForm(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
 	form := `<html>
 				<head>
 					<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -59,9 +61,8 @@ func process(w http.ResponseWriter, r *http.Request) {
 		err = model.Convert(reader, &serverWriter{w})
 	}
 	if err != nil {
-		msg := fmt.Sprintf("failed to transform XML to JSON: %v", err)
-		w.WriteHeader(500)
-		w.Write([]byte(msg))
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(fmt.Sprintf("failed to transform XML to JSON: %v", err)))
 	}
 }
 
@@ -81,7 +82,7 @@ func getReader(r *http.Request) (io.ReadCloser, error) {
 
 func (sw *serverWriter) Write(data []byte) (n int, err error) {
 	sw.w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	sw.w.WriteHeader(200)
+	sw.w.WriteHeader(http.StatusOK)
 	return sw.w.Write(data)
 }
 
