@@ -56,13 +56,16 @@ func showForm(w http.ResponseWriter) {
 func process(w http.ResponseWriter, r *http.Request) {
 	defer serverError(w, r)
 	reader, err := getReader(r)
-	if err == nil {
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf("failed to transform XML to JSON: %v", err)))
+	} else {
 		defer reader.Close()
 		err = model.Convert(reader, &serverWriter{w})
-	}
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Sprintf("failed to transform XML to JSON: %v", err)))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("failed to transform XML to JSON: %v", err)))
+		}
 	}
 }
 
