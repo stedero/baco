@@ -150,6 +150,7 @@ func Convert(r io.Reader, w io.Writer) error {
 	if err != nil {
 		return err
 	}
+	// rec.hexDumpBijlageHeader()
 	rec.createdStrippedBijlage()
 	// rec.saveBijlage()
 	return rec.writeJSON(w)
@@ -178,7 +179,6 @@ func (rr *ravoRecord) writeJSON(w io.Writer) error {
 
 func (rr *ravoRecord) saveBijlage() {
 	img, _ := base64.StdEncoding.DecodeString(rr.Bijlage)
-	fmt.Printf("%s", hex.Dump(img[:128]))
 	writer := rio.CreateFile("/Users/steef/Desktop/Basta/bijlage.jpg")
 	writer.Write(img)
 	writer.Close()
@@ -187,4 +187,9 @@ func (rr *ravoRecord) saveBijlage() {
 func (rr *ravoRecord) createdStrippedBijlage() {
 	img, _ := base64.StdEncoding.DecodeString(rr.Bijlage)
 	rr.StrippedBijlage = base64.StdEncoding.EncodeToString(img[64:])
+}
+
+func (rr *ravoRecord) hexDumpBijlageHeader() {
+	img, _ := base64.StdEncoding.DecodeString(rr.Bijlage)
+	fmt.Printf("%s", hex.Dump(img[:128]))
 }
