@@ -2,12 +2,17 @@ package model
 
 import (
 	"basta/ravo/baco/rio"
+	"bytes"
 	"encoding/base64"
+	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io"
+	"unicode/utf16"
+
+	"github.com/h2non/filetype"
 )
 
 type wrapper struct {
@@ -17,6 +22,17 @@ type wrapper struct {
 // ravoHTML is used for embedded HTML
 type ravoHTML struct {
 	InnerXML string `xml:",innerxml" json:"html"`
+}
+
+// BijlageType defines MIME type and extension
+type BijlageType struct {
+	Type      string
+	Subtype   string
+	Value     string
+	Extension string
+	Filename  string `json:",omitempty"`
+	Data      string
+	Binary    []byte `json:"-"`
 }
 
 // ravoRecord defines a Ravo XML record.
@@ -81,62 +97,62 @@ type ravoRecord struct {
 	MeerkostenGeschat                         int64  `xml:"MeerkostenGeschat"`
 	MinderkostenGeschat                       int64  `xml:"MinderkostenGeschat"`
 	NotitiesRWVbehandelaarNaam                string `xml:"NotitiesRWVbehandelaarNaam"`
-	NotitiesRWVbehandelaar                    string `xml:"NotitiesRWVbehandelaar"`
-	BetrokkenEngineering                      string `xml:"BetrokkenEngineering"`
-	BetrokkenBedrijfsburo                     string `xml:"BetrokkenBedrijfsburo"`
-	BetrokkenInkoopLogistiek                  string `xml:"BetrokkenInkoopLogistiek"`
-	BetrokkenProductie                        string `xml:"BetrokkenProductie"`
-	BetrokkenSales                            string `xml:"BetrokkenSales"`
-	BetrokkenAfterSales                       string `xml:"BetrokkenAfterSales"`
-	BetrokkenTraining                         string `xml:"BetrokkenTraining"`
-	InschattingUren                           int64  `xml:"InschattingUren"`
-	Normuur                                   int64  `xml:"Normuur"`
-	InschattingEngTotaal                      int64  `xml:"InschattingEngTotaal"`
-	InschattingOverig                         int64  `xml:"InschattingOverig"`
-	NormuurOverig                             int64  `xml:"NormuurOverig"`
-	InschattingOverigTotaal                   int64  `xml:"InschattingOverigTotaal"`
-	TerugkoppelingDoor                        string `xml:"TerugkoppelingDoor"`
-	TerugkoppelingDoorParaaf                  string `xml:"TerugkoppelingDoorParaaf"`
-	TerugkoppelingDoorDatum                   string `xml:"TerugkoppelingDoorDatum"`
-	Geaccepteerd                              bool   `xml:"Geaccepteerd"`
-	GeaccepteerdOVProdMan                     bool   `xml:"GeaccepteerdOVProdMan"`
-	GeaccepteerdOVOverig                      bool   `xml:"GeaccepteerdOVOverig"`
-	GeaccepteerdPrio                          int64  `xml:"GeaccepteerdPrio"`
-	GeaccepteerdDatum                         string `xml:"GeaccepteerdDatum"`
-	GeaccepteerdDatumSAP                      string `xml:"GeaccepteerdDatumSAP"`
-	GeaccepteerdOVProdManReden                string `xml:"GeaccepteerdOVProdManReden"`
-	GeaccepteerdOVProdManDatum                string `xml:"GeaccepteerdOVProdManDatum"`
-	GeaccepteerdOVOverigReden                 string `xml:"GeaccepteerdOVOverigReden"`
-	GeaccepteerdOVOverigDatum                 string `xml:"GeaccepteerdOVOverigDatum"`
-	Afgewezen                                 bool   `xml:"Afgewezen"`
-	AfgewezenReden                            string `xml:"AfgewezenReden"`
-	AfgewezenDatum                            string `xml:"AfgewezenDatum"`
-	VerkoopgebiedAnders                       string `xml:"VerkoopgebiedAnders"`
-	Cabine                                    bool   `xml:"Cabine"`
-	Container                                 bool   `xml:"Container"`
-	Chassis                                   bool   `xml:"Chassis"`
-	Optie                                     bool   `xml:"Optie"`
-	SparePart                                 bool   `xml:"SparePart"`
-	Europa                                    bool   `xml:"Europa"`
-	NAmerika                                  bool   `xml:"NAmerika"`
-	ROW                                       bool   `xml:"ROW"`
-	R540                                      bool   `xml:"R540"`
-	R560                                      bool   `xml:"R560"`
-	SnelheidAnders                            bool   `xml:"SnelheidAnders"`
-	Euro6                                     bool   `xml:"EURO-6" json:"EURO-6"`
-	StageIII                                  bool   `xml:"STAGE-III" json:"STAGE-III"`
-	Tier3USA                                  bool   `xml:"TIER3-USA" json:"TIER3-USA"`
-	Tier4USA                                  bool   `xml:"TIER4-USA" json:"TIER4-USA"`
-	MotorAandrijving                          bool   `xml:"MotorAandrijving"`
-	Hydrauliek                                bool   `xml:"Hydrauliek"`
-	Elektra                                   bool   `xml:"Elektra"`
-	Constructie                               bool   `xml:"Constructie"`
-	Montage                                   bool   `xml:"Montage"`
-	Oppervlaktebehandeling                    bool   `xml:"Oppervlaktebehandeling"`
-	Bijlage                                   string `xml:"Bijlage"`
-	StrippedBijlage                           string `xml:"StrippedBijlage"`
-	MeerMinder                                string `xml:"MeerMinder"`
-	ArtikelTekeningNr                         struct {
+	NotitiesRWVbehandelaar                    ravoHTML
+	BetrokkenEngineering                      string         `xml:"BetrokkenEngineering"`
+	BetrokkenBedrijfsburo                     string         `xml:"BetrokkenBedrijfsburo"`
+	BetrokkenInkoopLogistiek                  string         `xml:"BetrokkenInkoopLogistiek"`
+	BetrokkenProductie                        string         `xml:"BetrokkenProductie"`
+	BetrokkenSales                            string         `xml:"BetrokkenSales"`
+	BetrokkenAfterSales                       string         `xml:"BetrokkenAfterSales"`
+	BetrokkenTraining                         string         `xml:"BetrokkenTraining"`
+	InschattingUren                           int64          `xml:"InschattingUren"`
+	Normuur                                   int64          `xml:"Normuur"`
+	InschattingEngTotaal                      int64          `xml:"InschattingEngTotaal"`
+	InschattingOverig                         int64          `xml:"InschattingOverig"`
+	NormuurOverig                             int64          `xml:"NormuurOverig"`
+	InschattingOverigTotaal                   int64          `xml:"InschattingOverigTotaal"`
+	TerugkoppelingDoor                        string         `xml:"TerugkoppelingDoor"`
+	TerugkoppelingDoorParaaf                  string         `xml:"TerugkoppelingDoorParaaf"`
+	TerugkoppelingDoorDatum                   string         `xml:"TerugkoppelingDoorDatum"`
+	Geaccepteerd                              bool           `xml:"Geaccepteerd"`
+	GeaccepteerdOVProdMan                     bool           `xml:"GeaccepteerdOVProdMan"`
+	GeaccepteerdOVOverig                      bool           `xml:"GeaccepteerdOVOverig"`
+	GeaccepteerdPrio                          int64          `xml:"GeaccepteerdPrio"`
+	GeaccepteerdDatum                         string         `xml:"GeaccepteerdDatum"`
+	GeaccepteerdDatumSAP                      string         `xml:"GeaccepteerdDatumSAP"`
+	GeaccepteerdOVProdManReden                string         `xml:"GeaccepteerdOVProdManReden"`
+	GeaccepteerdOVProdManDatum                string         `xml:"GeaccepteerdOVProdManDatum"`
+	GeaccepteerdOVOverigReden                 string         `xml:"GeaccepteerdOVOverigReden"`
+	GeaccepteerdOVOverigDatum                 string         `xml:"GeaccepteerdOVOverigDatum"`
+	Afgewezen                                 bool           `xml:"Afgewezen"`
+	AfgewezenReden                            string         `xml:"AfgewezenReden"`
+	AfgewezenDatum                            string         `xml:"AfgewezenDatum"`
+	VerkoopgebiedAnders                       string         `xml:"VerkoopgebiedAnders"`
+	Cabine                                    bool           `xml:"Cabine"`
+	Container                                 bool           `xml:"Container"`
+	Chassis                                   bool           `xml:"Chassis"`
+	Optie                                     bool           `xml:"Optie"`
+	SparePart                                 bool           `xml:"SparePart"`
+	Europa                                    bool           `xml:"Europa"`
+	NAmerika                                  bool           `xml:"NAmerika"`
+	ROW                                       bool           `xml:"ROW"`
+	R540                                      bool           `xml:"R540"`
+	R560                                      bool           `xml:"R560"`
+	SnelheidAnders                            bool           `xml:"SnelheidAnders"`
+	Euro6                                     bool           `xml:"EURO-6" json:"EURO-6"`
+	StageIII                                  bool           `xml:"STAGE-III" json:"STAGE-III"`
+	Tier3USA                                  bool           `xml:"TIER3-USA" json:"TIER3-USA"`
+	Tier4USA                                  bool           `xml:"TIER4-USA" json:"TIER4-USA"`
+	MotorAandrijving                          bool           `xml:"MotorAandrijving"`
+	Hydrauliek                                bool           `xml:"Hydrauliek"`
+	Elektra                                   bool           `xml:"Elektra"`
+	Constructie                               bool           `xml:"Constructie"`
+	Montage                                   bool           `xml:"Montage"`
+	Oppervlaktebehandeling                    bool           `xml:"Oppervlaktebehandeling"`
+	XMLBijlage                                []string       `xml:"Bijlage" json:"-"`
+	Bijlagen                                  []*BijlageType `json:"Bijlagen"`
+	MeerMinder                                string         `xml:"MeerMinder"`
+	ArtikelTekeningNr                         []struct {
 		ArtikelTekening string `xml:"ArtikelTekening"`
 		ArtikelNaam     string `xml:"ArtikelNaam"`
 	} `xml:"ArtikelTekeningNr"`
@@ -150,9 +166,9 @@ func Convert(r io.Reader, w io.Writer) error {
 	if err != nil {
 		return err
 	}
+	rec.createBijlagen()
 	// rec.hexDumpBijlageHeader()
-	rec.createdStrippedBijlage()
-	// rec.saveBijlage()
+	// rec.saveBijlagen()
 	return rec.writeJSON(w)
 }
 
@@ -177,19 +193,62 @@ func (rr *ravoRecord) writeJSON(w io.Writer) error {
 	return err
 }
 
-func (rr *ravoRecord) saveBijlage() {
-	img, _ := base64.StdEncoding.DecodeString(rr.Bijlage)
-	writer := rio.CreateFile("/Users/steef/Desktop/Basta/bijlage.jpg")
-	writer.Write(img)
-	writer.Close()
-}
-
-func (rr *ravoRecord) createdStrippedBijlage() {
-	img, _ := base64.StdEncoding.DecodeString(rr.Bijlage)
-	rr.StrippedBijlage = base64.StdEncoding.EncodeToString(img[64:])
+func (rr *ravoRecord) createBijlagen() {
+	bijlagen := make([]*BijlageType, 0, len(rr.XMLBijlage))
+	for seq, xmlBijlage := range rr.XMLBijlage {
+		infoPathData, _ := base64.StdEncoding.DecodeString(xmlBijlage)
+		binary := infoPathData[64:]
+		t, error := filetype.Match(binary)
+		if error != nil {
+			t = filetype.Unknown
+		}
+		filename := extractFilename(infoPathData)
+		if filename == "" {
+			filename = fmt.Sprintf("bijlage%03d.%s", seq+1, t.Extension)
+		}
+		bijlage := &BijlageType{
+			Type:      t.MIME.Type,
+			Subtype:   t.MIME.Subtype,
+			Value:     t.MIME.Value,
+			Extension: t.Extension,
+			Filename:  filename,
+			Data:      base64.StdEncoding.EncodeToString(binary),
+			Binary:    binary}
+		bijlagen = append(bijlagen, bijlage)
+	}
+	rr.Bijlagen = bijlagen
 }
 
 func (rr *ravoRecord) hexDumpBijlageHeader() {
-	img, _ := base64.StdEncoding.DecodeString(rr.Bijlage)
-	fmt.Printf("%s", hex.Dump(img[:128]))
+	for _, bijlage := range rr.Bijlagen {
+		fmt.Printf("\n%s\n", bijlage.Filename)
+		fmt.Printf("%s", hex.Dump(bijlage.Binary[:128]))
+	}
+}
+
+func (rr *ravoRecord) saveBijlagen() {
+	for _, bijlage := range rr.Bijlagen {
+		writer := rio.CreateFile(fmt.Sprintf("/Users/steef/Desktop/Basta/%s", bijlage.Filename))
+		writer.Write(bijlage.Binary)
+		writer.Close()
+	}
+}
+
+func extractFilename(data []byte) string {
+	var fileSize uint32
+	var fileNameLength uint32
+	buf := bytes.NewReader(data[16:])
+	err := binary.Read(buf, binary.LittleEndian, &fileSize)
+	if err != nil {
+		return ""
+	}
+	err = binary.Read(buf, binary.LittleEndian, &fileNameLength)
+	if err != nil {
+		return ""
+	}
+	ints := make([]uint16, fileNameLength-1)
+	if err := binary.Read(buf, binary.LittleEndian, &ints); err != nil {
+		return ""
+	}
+	return string(utf16.Decode(ints))
 }
